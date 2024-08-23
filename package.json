@@ -7,7 +7,8 @@
     "start": "bunx --bun astro dev",
     "build": "bunx --bun astro check && astro build",
     "preview": "bunx --bun astro preview",
-    "astro": "bunx --bun astro"
+    "astro": "bunx --bun astro",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "astro": "^4.14.5",
@@ -16,6 +17,8 @@
   },
   "devDependencies": {
     "@types/bun": "^1.1.6",
-    "@types/node": "^22.5.0"
+    "@types/node": "^22.5.0",
+    "prettier": "^3.3.3",
+    "prettier-plugin-astro": "^0.14.1"
   }
 }
