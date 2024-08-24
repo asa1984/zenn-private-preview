@@ -1,4 +1,14 @@
-export type Book = {
+import fs from "node:fs/promises";
+import z from "zod";
+import { env } from "./env";
+import {
+  zodToResult,
+  readFileText,
+  readYaml,
+  parseFrontmatter,
+} from "./helper";
+
+export type BookMeta = {
   slug: string;
   title: string;
   summary: string;
@@ -14,17 +24,78 @@ export type Chapter = {
   markdown: string;
 };
 
-export type ChapterMeta = Omit<Chapter, "markdown">;
+const bookConfigSchema = z.object({
+  title: z.string(),
+  summary: z.string(),
+  topics: z.array(z.string()),
+  published: z.boolean(),
+  price: z.number(),
+  chapters: z.array(z.string()),
+});
 
-export async function getAllBooks(): Promise<Book[]> {}
+const chapterFrontmatterSchema = z.object({
+  title: z.string(),
+});
 
-export async function getBookBySlug(slug: string): Promise<Book | null> {}
+const parseBookConfig = zodToResult(bookConfigSchema, (e) => e.message);
+const parseChapterFrontmatter = zodToResult(
+  chapterFrontmatterSchema,
+  (e) => e.message,
+);
 
-export async function getAllChapterMetas(
-  slug: string,
-): Promise<ChapterMeta[]> {}
+export async function getBookMetaBySlug(
+  bookSlug: string,
+): Promise<BookMeta | null> {
+  const bookConfigPath = `${env.ZENN_DIR}/books/${bookSlug}/config.yaml`;
+  const result = await readYaml(bookConfigPath);
+  return result
+    .andThen(parseBookConfig)
+    .map(({ chapters, ...rest }) => ({
+      ...rest,
+      slug: bookSlug,
+      chapterSlugs: chapters,
+    }))
+    .unwrapOr(null);
+}
+
+export async function getAllBookMetas(): Promise<BookMeta[]> {
+  const bookDirs = await fs.readdir(`${env.ZENN_DIR}/books`, {
+    withFileTypes: true,
+  });
+  const results = await Promise.all(
+    bookDirs.map(async (bookDir) => getBookMetaBySlug(bookDir.name)),
+  );
+  return results.filter((result) => result !== null);
+}
 
 export async function getChapterBySlug(
   bookSlug: string,
   chapterSlug: string,
-): Promise<Chapter | null> {}
+): Promise<Chapter | null> {
+  const bookDir = `${env.ZENN_DIR}/books/${bookSlug}`;
+  const chapterFilePath = `${bookDir}/${chapterSlug}.md`;
+  const chapterRawResult = await readFileText(chapterFilePath);
+  const chapterResult = chapterRawResult
+    .andThen(parseFrontmatter)
+    .andThen(({ data, content }) =>
+      parseChapterFrontmatter(data).map(({ title }) => ({
+        slug: chapterSlug,
+        title,
+        markdown: content,
+      })),
+    );
+  return chapterResult.unwrapOr(null);
+}
+
+export async function getAllChapters(bookSlug: string): Promise<Chapter[]> {
+  const meta = await getBookMetaBySlug(bookSlug);
+  if (!meta) return [];
+
+  const chapters = await Promise.all(
+    meta.chapterSlugs.map(async (chapterSlug) =>
+      getChapterBySlug(bookSlug, chapterSlug),
+    ),
+  ).then((chapters) => chapters.filter((chapter) => chapter !== null));
+
+  return chapters;
+}

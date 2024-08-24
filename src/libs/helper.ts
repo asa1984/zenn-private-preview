@@ -45,6 +45,31 @@ export async function readFileText(
   );
 }
 
+export async function readYaml(
+  filepath: string,
+): Promise<Result<unknown, string>> {
+  let file = Bun.file(filepath);
+  const exists = await file.exists();
+  if (!exists) {
+    const newFilepath = filepath.endsWith(".yaml")
+      ? filepath.replace(".yaml", ".yml")
+      : filepath.replace(".yml", ".yaml");
+    const newFile = Bun.file(newFilepath);
+    const exists = await newFile.exists();
+    if (!exists) return err(`${filepath}が見つかりません。`);
+    file = newFile;
+  }
+
+  return throwableToResultAsync(
+    async () => {
+      const yamlString = await file.text();
+      const data = yaml.load(yamlString);
+      return data;
+    },
+    () => `${filepath}の読み取りに失敗しました。`,
+  );
+}
+
 export function parseFrontmatter(
   raw: string,
 ): Result<ReturnType<typeof matter>, string> {

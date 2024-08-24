@@ -1,13 +1,13 @@
 import { expect, test } from "bun:test";
 import {
-  getAllBooks,
-  getBookBySlug,
-  getAllChapterMetas,
+  getBookMetaBySlug,
+  getAllBookMetas,
+  getAllChapters,
   getChapterBySlug,
 } from "@/libs/book";
 
-test("全ての本を取得する", async () => {
-  const books = await getAllBooks();
+test("全ての本のメタデータを取得する", async () => {
+  const books = await getAllBookMetas();
   books.sort((a, b) => a.slug.localeCompare(b.slug));
   expect(books).toHaveLength(2);
   expect(books[0]).toEqual({
@@ -30,8 +30,8 @@ test("全ての本を取得する", async () => {
   });
 });
 
-test("指定したslugの本を取得する", async () => {
-  const book = await getBookBySlug("valid-book");
+test("指定したslugの本のメタデータを取得する", async () => {
+  const book = await getBookMetaBySlug("valid-book");
   expect(book).toEqual({
     slug: "valid-book",
     title: "正常な本",
@@ -44,21 +44,26 @@ test("指定したslugの本を取得する", async () => {
 });
 
 test("指定したslugの本が存在しない場合はnullを返す", async () => {
-  const book = await getBookBySlug("not-found");
+  const book = await getBookMetaBySlug("not-found");
   expect(book).toBeNull();
 });
 
-test("全てのチャプターのメタデータを取得する", async () => {
-  const metas = await getAllChapterMetas("valid-book");
-  metas.sort((a, b) => a.slug.localeCompare(b.slug));
-  expect(metas).toHaveLength(2);
-  expect(metas[0]).toEqual({
+test("全てのチャプターを取得する", async () => {
+  const chapters = await getAllChapters("valid-book");
+  expect(chapters).toHaveLength(2);
+  expect(chapters[0]).toEqual({
     slug: "01-first",
     title: "1番目",
+    markdown: `
+1番目のチャプターです。
+`,
   });
-  expect(metas[1]).toEqual({
+  expect(chapters[1]).toEqual({
     slug: "02-second",
     title: "2番目",
+    markdown: `
+2番目のチャプターです。
+`,
   });
 });
 
