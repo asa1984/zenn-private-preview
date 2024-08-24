@@ -1,16 +1,67 @@
 ---
+import { getAllArticleMetas } from "@/libs/article";
+import { getAllBookMetas } from "@/libs/book";
+import RootLayout from "@/layouts/RootLayout.astro";
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+import ArticleCard from "@/components/ArticleCard.astro";
+import BookCard from "@/components/BookCard.astro";
 
+const articleMetas = await getAllArticleMetas();
+const techArticleMetas = articleMetas.filter((meta) => meta.type === "tech");
+const ideaArticleMetas = articleMetas.filter((meta) => meta.type === "idea");
+
+const bookMetas = await getAllBookMetas();
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<RootLayout title="Zenn Private Preview">
+  <DefaultLayout>
+    <div class="h-full bg-sky-50">
+      <div class="mx-auto w-full max-w-2xl p-6">
+        <h2 class="mt-8 text-3xl font-bold">Tech</h2>
+        {
+          techArticleMetas.length === 0 ? (
+            <p>記事がありません</p>
+          ) : (
+            <ul class="mt-4">
+              {techArticleMetas.map((meta) => (
+                <li class="mt-4">
+                  <ArticleCard {...meta} />
+                </li>
+              ))}
+            </ul>
+          )
+        }
+
+        <h2 class="mt-8 text-3xl font-bold">Idea</h2>
+        {
+          ideaArticleMetas.length === 0 ? (
+            <p>記事がありません</p>
+          ) : (
+            <ul class="mt-4">
+              {ideaArticleMetas.map((meta) => (
+                <li class="mt-4">
+                  <ArticleCard {...meta} />
+                </li>
+              ))}
+            </ul>
+          )
+        }
+
+        <h2 class="mt-8 text-3xl font-bold">Books</h2>
+        {
+          bookMetas.length === 0 ? (
+            <p>本がありません</p>
+          ) : (
+            <ul class="mt-4">
+              {bookMetas.map((meta) => (
+                <li class="mt-4">
+                  <BookCard {...meta} />
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+    </div>
+  </DefaultLayout>
+</RootLayout>

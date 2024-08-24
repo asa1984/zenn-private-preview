@@ -1,0 +1,14 @@
+---
+import type { ArticleMeta } from "@/libs/article";
+
+interface Props extends ArticleMeta {}
+
+const { slug, title, emoji } = Astro.props;
+---
+
+<a href={`/articles/${slug}`} class="flex items-center gap-2">
+  <span class="select-none text-xl leading-none">
+    {emoji}
+  </span>
+  <h3 class="text-xl font-bold">{title}</h3>
+</a>
