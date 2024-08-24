@@ -23,6 +23,8 @@
     "neverthrow": "^7.0.1",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4",
+    "zenn-content-css": "^0.1.155",
+    "zenn-markdown-html": "^0.1.155",
     "zod": "^3.23.8"
   },
   "devDependencies": {

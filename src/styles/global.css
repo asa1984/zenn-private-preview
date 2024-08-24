@@ -1,0 +1,7 @@
+/* zenn-content-cssを適用する箇所をリセットCSSの適用対象から除外する */
+@scope (html) to (.znc) {
+  @tailwind base;
+}
+
+@tailwind components;
+@tailwind utilities;

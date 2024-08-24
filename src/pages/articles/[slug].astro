@@ -1,0 +1,55 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getAllArticleMetas, getArticleBySlug } from "@/libs/article";
+import RootLayout from "@/layouts/RootLayout.astro";
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+import Markdown from "@/components/Markdown.astro";
+
+export const getStaticPaths = (async () => {
+  const metas = await getAllArticleMetas();
+  const articles = await Promise.all(
+    metas.map(({ slug }) => getArticleBySlug(slug)),
+  ).then((articles) => articles.filter((article) => article != null));
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: article,
+  }));
+}) satisfies GetStaticPaths;
+
+const { title, emoji, markdown, topics } = Astro.props;
+---
+
+<RootLayout title={`プレビュー: ${title}`}>
+  <script
+    is:inline
+    src="https://embed.zenn.studio/js/listen-embed-event.js"
+    slot="head"></script>
+  <DefaultLayout>
+    <article class="h-full bg-sky-50 p-4">
+      <header class="mt-8">
+        <div class="mx-auto max-w-max">
+          <span class="block text-center text-5xl leading-none">{emoji}</span>
+          <h1 class="mt-6 max-w-max text-2xl font-bold">{title}</h1>
+        </div>
+      </header>
+      <div>
+        <main
+          class="mx-auto mt-8 min-h-[50vh] w-full max-w-4xl rounded-xl bg-white p-8"
+        >
+          <div class="mb-4">
+            {
+              topics.length > 0 && (
+                <ul class="flex flex-wrap gap-2">
+                  {topics.map((topic) => (
+                    <li class="rounded-full border px-2 py-1">{topic}</li>
+                  ))}
+                </ul>
+              )
+            }
+          </div>
+          <Markdown markdown={markdown} />
+        </main>
+      </div>
+    </article>
+  </DefaultLayout>
+</RootLayout>

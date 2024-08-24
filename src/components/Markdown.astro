@@ -1,0 +1,13 @@
+---
+import "zenn-content-css";
+
+import { markdownToHtml } from "@/libs/markdown";
+
+interface Props {
+  markdown: string;
+}
+const { markdown } = Astro.props;
+const html = markdownToHtml(markdown);
+---
+
+<div class="znc" set:html={html} />

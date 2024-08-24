@@ -5,12 +5,17 @@ import icon from "astro-icon";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind(), icon()],
-  vite: {
-    server: {
-      watch: {
-        usePolling: true,
-      },
-    },
-  },
+	integrations: [
+		tailwind({
+			applyBaseStyles: false,
+		}),
+		icon(),
+	],
+	vite: {
+		server: {
+			watch: {
+				usePolling: true,
+			},
+		},
+	},
 });
