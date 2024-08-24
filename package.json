@@ -1,30 +1,33 @@
 {
-  "name": "",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "bunx --bun astro dev",
-    "start": "bunx --bun astro dev",
-    "build": "bunx --bun astro check && astro build",
-    "preview": "bunx --bun astro preview",
-    "astro": "bunx --bun astro",
-    "format": "prettier --write .",
-    "test": "bun test"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.9.3",
-    "astro": "^4.14.5",
-    "gray-matter": "^4.0.3",
-    "js-yaml": "^4.1.0",
-    "neverthrow": "^7.0.1",
-    "typescript": "^5.5.4",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@types/bun": "^1.1.6",
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^22.5.0",
-    "prettier": "^3.3.3",
-    "prettier-plugin-astro": "^0.14.1"
-  }
+	"name": "",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "bunx --bun astro dev",
+		"start": "bunx --bun astro dev",
+		"build": "bunx --bun astro check && astro build",
+		"preview": "bunx --bun astro preview",
+		"astro": "bunx --bun astro",
+		"format": "prettier --write .",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"@astrojs/check": "^0.9.3",
+		"@astrojs/tailwind": "^5.1.0",
+		"astro": "^4.14.5",
+		"gray-matter": "^4.0.3",
+		"js-yaml": "^4.1.0",
+		"neverthrow": "^7.0.1",
+		"tailwindcss": "^3.4.10",
+		"typescript": "^5.5.4",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"@types/bun": "^1.1.6",
+		"@types/js-yaml": "^4.0.9",
+		"@types/node": "^22.5.0",
+		"prettier": "^3.3.3",
+		"prettier-plugin-astro": "^0.14.1",
+		"prettier-plugin-tailwindcss": "^0.6.6"
+	}
 }
