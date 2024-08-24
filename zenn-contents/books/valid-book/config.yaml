@@ -1,0 +1,10 @@
+title: "正常な本"
+summary: "正常な本の説明"
+topics: ["test", "valid"]
+published: true
+price: 0
+chapters:
+  - 01-first
+  - 02-second
+  # Chapter03は指定しない
+  # - 03-third

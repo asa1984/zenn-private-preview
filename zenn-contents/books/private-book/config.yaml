@@ -1,0 +1,8 @@
+title: "プライベートな本"
+summary: "プラーベートな本の説明"
+topics: ["test", "private"]
+published: false
+price: 0
+chapters:
+  - 01-first
+  - 02-second

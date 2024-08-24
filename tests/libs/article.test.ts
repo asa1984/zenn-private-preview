@@ -1,5 +1,5 @@
-import { getAllArticleMetas, getArticleBySlug } from "@/libs/article";
 import { expect, test } from "bun:test";
+import { getAllArticleMetas, getArticleBySlug } from "@/libs/article";
 
 test("全記事のメタデータを取得する", async () => {
   const metas = await getAllArticleMetas();
