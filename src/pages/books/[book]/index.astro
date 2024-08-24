@@ -1,0 +1,70 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getAllBookMetas, getAllChapters } from "@/libs/book";
+import RootLayout from "@/layouts/RootLayout.astro";
+import DefaultLayout from "@/layouts/DefaultLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const bookMetas = await getAllBookMetas();
+
+  const bookPromises = bookMetas.map(async (bookMeta) => {
+    const chapters = await getAllChapters(bookMeta.slug);
+    return {
+      params: {
+        book: bookMeta.slug,
+      },
+      props: {
+        ...bookMeta,
+        chapters,
+      },
+    };
+  });
+
+  return await Promise.all(bookPromises);
+}) satisfies GetStaticPaths;
+
+const { slug, title, summary, chapters, topics } = Astro.props;
+---
+
+<RootLayout title={`プレビュー: ${title}`}>
+  <DefaultLayout>
+    <article class="h-full">
+      <header class="bg-sky-50 px-4 py-6">
+        <div class="mx-auto max-w-2xl">
+          <h1 class="mx-auto mt-8 max-w-max text-4xl font-bold">{title}</h1>
+          <p class="mt-6 text-center">{summary}</p>
+        </div>
+      </header>
+      <main class="w-full px-4">
+        <div class="mx-auto max-w-2xl">
+          <h2 class="mt-8 border-b pb-2 text-2xl font-bold">Chapters</h2>
+          <ol class="mt-4 pl-2">
+            {
+              chapters.map((chapter, index) => (
+                <li>
+                  <a
+                    href={`/books/${slug}/${chapter.slug}`}
+                    class="flex flex-col pb-4 hover:text-blue-400"
+                  >
+                    <span class="select-none text-sm font-bold text-gray-600">
+                      Chapter {(index + 1).toString().padStart(2, "0")}
+                    </span>
+                    <span class="text-lg font-semibold">{chapter.title}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+          <h2 class="mt-6 border-b pb-2 text-2xl font-bold">Topics</h2>
+          <ul class="mt-4 flex gap-2">
+            {
+              topics.map((topic) => (
+                <li class="rounded-full border p-2">{topic}</li>
+              ))
+            }
+          </ul>
+        </div>
+      </main>
+    </article>
+  </DefaultLayout>
+</RootLayout>

@@ -1,0 +1,46 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getAllBookMetas, getAllChapters } from "@/libs/book";
+import RootLayout from "@/layouts/RootLayout.astro";
+import BookLayout from "@/layouts/BookLayout.astro";
+import Markdownn from "@/components/Markdown.astro";
+
+export const getStaticPaths = (async () => {
+  const bookMetas = await getAllBookMetas();
+
+  // クロージャーがPromiseを返す場合、flatMapは配列をフラットにできない
+  const promises = bookMetas.map(async (bookMeta) => {
+    const chapters = await getAllChapters(bookMeta.slug);
+    const book = {
+      ...bookMeta,
+      chapters,
+    };
+    return chapters.map((chapter) => ({
+      params: {
+        book: book.slug,
+        chapter: chapter.slug,
+      },
+      props: {
+        book,
+        chapter,
+      },
+    }));
+  });
+  const awaited = await Promise.all(promises);
+
+  return awaited.flat();
+}) satisfies GetStaticPaths;
+
+const { chapter } = Astro.props;
+---
+
+<RootLayout title={chapter.title}>
+  <article class="mx-auto max-w-4xl p-4">
+    <header class="border-b">
+      <h1 class="text-2xl font-bold">{chapter.title}</h1>
+    </header>
+    <main class="mt-4">
+      <Markdownn markdown={chapter.markdown} />
+    </main>
+  </article>
+</RootLayout>
