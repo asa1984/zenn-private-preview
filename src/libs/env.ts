@@ -1,5 +1,11 @@
-type Env = typeof process.env & {
-	BASE_DIR: string;
-};
+import z from "zod";
 
-export const env = process.env as Env;
+const envSchema = z.object({
+  ZENN_DIR: z.string().default("zenn-contents"),
+  NODE_ENV: z.string().optional(),
+  TZ: z.string().optional(),
+});
+
+export type Env = z.infer<typeof envSchema>;
+
+export const env = envSchema.parse(process.env);

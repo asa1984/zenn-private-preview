@@ -8,7 +8,8 @@
     "build": "bunx --bun astro check && astro build",
     "preview": "bunx --bun astro preview",
     "astro": "bunx --bun astro",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "bun test"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.3",
