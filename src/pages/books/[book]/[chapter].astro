@@ -1,5 +1,6 @@
 ---
 import type { GetStaticPaths } from "astro";
+import { Icon } from "astro-icon/components";
 import { getAllBookMetas, getAllChapters } from "@/libs/book";
 import RootLayout from "@/layouts/RootLayout.astro";
 import BookLayout from "@/layouts/BookLayout.astro";
@@ -15,7 +16,7 @@ export const getStaticPaths = (async () => {
       ...bookMeta,
       chapters,
     };
-    return chapters.map((chapter) => ({
+    return chapters.map((chapter, index) => ({
       params: {
         book: book.slug,
         chapter: chapter.slug,
@@ -23,6 +24,7 @@ export const getStaticPaths = (async () => {
       props: {
         book,
         chapter,
+        chapterIndex: index,
       },
     }));
   });
@@ -31,16 +33,63 @@ export const getStaticPaths = (async () => {
   return awaited.flat();
 }) satisfies GetStaticPaths;
 
-const { chapter } = Astro.props;
+const { book, chapter, chapterIndex } = Astro.props;
 ---
 
 <RootLayout title={chapter.title}>
-  <article class="mx-auto max-w-4xl p-4">
-    <header class="border-b">
-      <h1 class="text-2xl font-bold">{chapter.title}</h1>
-    </header>
-    <main class="mt-4">
-      <Markdownn markdown={chapter.markdown} />
-    </main>
-  </article>
+  <BookLayout {...book}>
+    <article class="mx-auto max-w-4xl p-4">
+      <header class="border-b pb-4">
+        <div class="font-semibold text-gray-600">
+          Chapter {(chapterIndex + 1).toString().padStart(2, "0")}
+        </div>
+        <h1 class="mt-2 text-3xl font-bold">{chapter.title}</h1>
+      </header>
+
+      <main class="mt-12">
+        <Markdownn markdown={chapter.markdown} />
+      </main>
+
+      <footer
+        class="flex flex-col justify-between gap-6 py-16 sm:flex-row-reverse"
+      >
+        <div class="w-full sm:max-w-64">
+          {
+            book.chapters.at(chapterIndex + 1) && (
+              <a
+                href={`/books/${book.slug}/${book.chapters.at(chapterIndex + 1)?.slug}`}
+                class="flex items-center justify-between gap-4 rounded-xl border p-4"
+              >
+                <div>
+                  <div class="text-sm text-gray-600">NEXT</div>
+                  <div class="mt-2 font-semibold">
+                    {book.chapters.at(chapterIndex + 1)?.title}
+                  </div>
+                </div>
+                <Icon name="lucide:arrow-right" class="text-lg text-gray-600" />
+              </a>
+            )
+          }
+        </div>
+        <div class="w-full sm:max-w-64">
+          {
+            chapterIndex != 0 && book.chapters.at(chapterIndex - 1) && (
+              <a
+                href={`/books/${book.slug}/${book.chapters.at(chapterIndex - 1)?.slug}`}
+                class="flex items-center gap-4 rounded-xl border p-4"
+              >
+                <Icon name="lucide:arrow-left" class="text-lg text-gray-600" />
+                <div>
+                  <div class="text-sm text-gray-600">PREV</div>
+                  <div class="mt-2 font-semibold">
+                    {book.chapters.at(chapterIndex - 1)?.title}
+                  </div>
+                </div>
+              </a>
+            )
+          }
+        </div>
+      </footer>
+    </article>
+  </BookLayout>
 </RootLayout>
