@@ -3,5 +3,11 @@
   @tailwind base;
 }
 
+/* TODO */
+/* Firefoxにはまだ@scopeがないため、そのままbaseスタイルを適用 */
+@-moz-document url-prefix() {
+  @tailwind base;
+}
+
 @tailwind components;
 @tailwind utilities;
