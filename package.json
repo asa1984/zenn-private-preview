@@ -1,11 +1,11 @@
 {
-  "name": "",
+  "name": "zenn-private-preview",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
     "dev": "bunx --bun astro dev",
     "start": "bunx --bun astro dev",
-    "build": "bunx --bun astro check && astro build",
+    "build": "bunx --bun astro check && bunx --bun astro build",
     "preview": "bunx --bun astro preview",
     "astro": "bunx --bun astro",
     "format": "prettier --write .",
