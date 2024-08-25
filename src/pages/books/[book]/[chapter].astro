@@ -37,8 +37,12 @@ const { book, chapter, chapterIndex } = Astro.props;
 ---
 
 <RootLayout title={chapter.title}>
+  <script
+    is:inline
+    src="https://embed.zenn.studio/js/listen-embed-event.js"
+    slot="head"></script>
   <BookLayout {...book}>
-    <article class="mx-auto max-w-4xl p-4">
+    <article class="mx-auto max-w-4xl p-5 sm:p-12">
       <header class="border-b pb-4">
         <div class="font-semibold text-gray-600">
           Chapter {(chapterIndex + 1).toString().padStart(2, "0")}
@@ -46,7 +50,7 @@ const { book, chapter, chapterIndex } = Astro.props;
         <h1 class="mt-2 text-3xl font-bold">{chapter.title}</h1>
       </header>
 
-      <main class="mt-12">
+      <main class="mt-8 sm:mt-12">
         <Markdownn markdown={chapter.markdown} />
       </main>
 

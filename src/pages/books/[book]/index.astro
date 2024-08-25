@@ -31,11 +31,13 @@ const { slug, title, summary, chapters, topics } = Astro.props;
     <article class="h-full">
       <header class="bg-sky-50 px-4 py-6">
         <div class="mx-auto max-w-2xl">
-          <h1 class="mx-auto mt-8 max-w-max text-4xl font-bold">{title}</h1>
-          <p class="mt-6 text-center">{summary}</p>
+          <h1 class="mx-auto mt-8 max-w-max text-3xl font-bold">{title}</h1>
+          <p class="mx-auto mt-6 max-w-max whitespace-pre text-sm sm:text-base">
+            {summary}
+          </p>
         </div>
       </header>
-      <main class="w-full px-4">
+      <main class="w-full px-5 pb-8 sm:px-12">
         <div class="mx-auto max-w-2xl">
           <h2 class="mt-8 border-b pb-2 text-2xl font-bold">Chapters</h2>
           <ol class="mt-4 pl-2">

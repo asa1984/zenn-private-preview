@@ -20,7 +20,7 @@ const bookMetas = await getAllBookMetas();
         <h2 class="mt-8 text-3xl font-bold">Tech</h2>
         {
           techArticleMetas.length === 0 ? (
-            <p>記事がありません</p>
+            <p class="mt-4">記事がありません</p>
           ) : (
             <ul class="mt-4">
               {techArticleMetas.map((meta) => (
@@ -35,7 +35,7 @@ const bookMetas = await getAllBookMetas();
         <h2 class="mt-8 text-3xl font-bold">Idea</h2>
         {
           ideaArticleMetas.length === 0 ? (
-            <p>記事がありません</p>
+            <p class="mt-4">記事がありません</p>
           ) : (
             <ul class="mt-4">
               {ideaArticleMetas.map((meta) => (
