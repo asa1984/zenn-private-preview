@@ -1,0 +1,49 @@
+name: Zenn Private Preview
+description: Zennの記事・本の限定公開ページのビルド・デプロイ
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Clone zenn-private-preview
+      run: git clone https://github.com/asa1984/zenn-private-preview
+    - run: cd zenn-private-preview
+
+    - name: Install dependencies
+      run: bun install
+
+    - name: Build website
+      run: bun run ./actions/build.ts
+
+    - name: Deploy website
+      run: bun run ./actions/deploy.ts
+
+inputs:
+  cloudflare-account-id:
+    description: Cloudflare account ID
+    required: true
+
+  cloudflare-api-token:
+    description: Cloudflare API Token
+    required: true
+
+  enable-basic-auth:
+    description: Enable basic auth
+    required: true
+    default: false
+
+  basic-auth-username:
+    description: Basic auth username
+    required: false
+
+  basic-auth-password:
+    description: Basic auth password
+    required: false
+
+outputs:
+  deployment-url:
+    description: URL of the deployed website
