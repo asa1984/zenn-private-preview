@@ -62,9 +62,9 @@ const { book, chapter, chapterIndex } = Astro.props;
             book.chapters.at(chapterIndex + 1) && (
               <a
                 href={`/books/${book.slug}/${book.chapters.at(chapterIndex + 1)?.slug}`}
-                class="flex items-center justify-between gap-4 rounded-xl border p-4"
+                class="flex h-full items-center justify-between gap-4 rounded-xl border p-4"
               >
-                <div>
+                <div class="h-full">
                   <div class="text-sm text-gray-600">NEXT</div>
                   <div class="mt-2 font-semibold">
                     {book.chapters.at(chapterIndex + 1)?.title}
@@ -80,10 +80,10 @@ const { book, chapter, chapterIndex } = Astro.props;
             chapterIndex != 0 && book.chapters.at(chapterIndex - 1) && (
               <a
                 href={`/books/${book.slug}/${book.chapters.at(chapterIndex - 1)?.slug}`}
-                class="flex items-center gap-4 rounded-xl border p-4"
+                class="flex h-full items-center gap-4 rounded-xl border p-4"
               >
                 <Icon name="lucide:arrow-left" class="text-lg text-gray-600" />
-                <div>
+                <div class="h-full">
                   <div class="text-sm text-gray-600">PREV</div>
                   <div class="mt-2 font-semibold">
                     {book.chapters.at(chapterIndex - 1)?.title}

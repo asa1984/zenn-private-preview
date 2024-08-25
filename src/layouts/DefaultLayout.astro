@@ -14,8 +14,10 @@ import { Icon } from "astro-icon/components";
     </a>
     <a
       href={env.ZENN_GITHUB_REPOSITORY_URL}
+      target="_blank"
+      rel="noopener noreferrer"
       class="flex items-center gap-1 rounded-full border p-1 px-3 aria-disabled:select-none aria-disabled:opacity-60 aria-[disabled=false]:hover:bg-gray-100"
-      aria-disabled={env.ZENN_GITHUB_REPOSITORY_URL === "" ? "false" : "true"}
+      aria-disabled={Boolean(env.ZENN_GITHUB_REPOSITORY_URL) ? "false" : "true"}
     >
       <Icon name="simple-icons:github" />
       <span class="">GitHubで開く</span>
