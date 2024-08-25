@@ -7,6 +7,7 @@
     "start": "bunx --bun astro dev",
     "build": "bunx --bun astro check && bunx --bun astro build",
     "preview": "bunx --bun astro preview",
+    "preview:pages": "wrangler pages dev ./dist",
     "astro": "bunx --bun astro",
     "format": "prettier --write .",
     "test": "bun test"
@@ -20,6 +21,7 @@
     "astro": "^4.14.5",
     "astro-icon": "^1.1.1",
     "gray-matter": "^4.0.3",
+    "hono": "^4.5.8",
     "js-yaml": "^4.1.0",
     "neverthrow": "^7.0.1",
     "tailwindcss": "^3.4.10",
@@ -34,6 +36,7 @@
     "@types/node": "^22.5.0",
     "prettier": "^3.3.3",
     "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.6.6"
+    "prettier-plugin-tailwindcss": "^0.6.6",
+    "wrangler": "^3.72.2"
   }
 }
