@@ -1,34 +1,17 @@
 name: Zenn Private Preview
 description: Zennの記事・本の限定公開ページのビルド・デプロイ
 
-runs:
-  using: composite
-  steps:
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v2
-      with:
-        bun-version: latest
-
-    - name: Clone zenn-private-preview
-      run: git clone https://github.com/asa1984/zenn-private-preview
-    - run: cd zenn-private-preview
-
-    - name: Install dependencies
-      run: bun install
-
-    - name: Build website
-      run: bun run ./actions/build.ts
-
-    - name: Deploy website
-      run: bun run ./actions/deploy.ts
-
 inputs:
   cloudflare-account-id:
-    description: Cloudflare account ID
+    description: CloudflareのアカウントID
     required: true
 
   cloudflare-api-token:
-    description: Cloudflare API Token
+    description: CloudflareのAPIトークン
+    required: true
+
+  cloudflare-project-name:
+    description: Cloudflare Pagesのプロジェクト名
     required: true
 
   enable-basic-auth:
@@ -44,6 +27,80 @@ inputs:
     description: Basic auth password
     required: false
 
+runs:
+  using: composite
+  steps:
+    - name: Bunをセットアップ
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: asa1984/zenn-private-previewをクローン
+      shell: bash
+      run: git clone https://github.com/asa1984/zenn-private-preview
+
+    - name: 依存関係をインストール
+      shell: bash
+      run: |
+        cd zenn-private-preview
+        bun install
+
+    - if: github.event.repository.private == true
+      name: Privateリポジトリ設定でプレビューページをビルド
+      shell: bash
+      env:
+        ZENN_DIR: ..
+      run: |
+        cd zenn-private-preview
+        bun run build
+
+    - if: github.event.repository.private == false
+      name: Publicリポジトリ設定でプレビューページをビルド
+      shell: bash
+      env:
+        ZENN_DIR: ..
+        ZENN_GITHUB_REPOSITORY_URL: ${{ github.event.repository.url }}
+      run: |
+        cd zenn-private-preview
+        bun run build
+
+    - if: ${{ inputs.enable-basic-auth == 'true' && inputs.basic-auth-username != '' && inputs.basic-auth-password != '' }}
+      name: Basic認証のシークレットを設定
+      shell: bash
+      env:
+        CLOUDFLARE_CDDOUNT_ID: ${{ inputs.cloudflare-account-id }}
+        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
+        CLOUDFLARE_PROJECT_NAME: ${{ inputs.cloudflare-project-name }}
+        BASIC_AUTH_USERNAME: ${{ inputs.basic-auth-username }}
+        BASIC_AUTH_PASSWORD: ${{ inputs.basic-auth-password }}
+      run: |
+        cd zenn-private-preview
+        echo "{ \"BASIC_AUTH_USERNAME\": \"${BASIC_AUTH_USERNAME}\", \"BASIC_AUTH_PASSWORD\": \"${BASIC_AUTH_PASSWORD}\" }" | bun wrangler pages secret bulk --project-name ${CLOUDFLARE_PROJECT_NAME}
+
+    - if: ${{ inputs.enable-basic-auth == 'true' }}
+      name: Basic認証付きでプレビューページをデプロイ
+      shell: bash
+      env:
+        CLOUDFLARE_CDDOUNT_ID: ${{ inputs.cloudflare-account-id }}
+        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
+        CLOUDFLARE_PROJECT_NAME: ${{ inputs.cloudflare-project-name }}
+      run: |
+        cd zenn-private-preview
+        DEPLOYED_URL=$(bun wrangler pages deploy ./dist --project-name ${CLOUDFLARE_PROJECT_NAME} | grep -oP 'https?://[a-zA-Z0-9.-]+\.pages\.dev')
+        echo "deployed-url=${DEPLOYED_URL}" >> $GITHUB_OUTPUT
+
+    - if: ${{ inputs.enable-basic-auth == 'false' }}
+      name: Basic認証なしでプレビューページをデプロイ
+      shell: bash
+      env:
+        CLOUDFLARE_CDDOUNT_ID: ${{ inputs.cloudflare-account-id }}
+        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
+        CLOUDFLARE_PROJECT_NAME: ${{ inputs.cloudflare-project-name }}
+      run: |
+        cd zenn-private-preview/dist
+        DEPLOYED_URL=$(bun wrangler pages deploy . --project-name ${CLOUDFLARE_PROJECT_NAME} | grep -oP 'https?://[a-zA-Z0-9.-]+\.pages\.dev')
+        echo "deployed-url=${DEPLOYED_URL}" >> $GITHUB_OUTPUT
+
 outputs:
   deployment-url:
-    description: URL of the deployed website
+    description: プレビューページのURL
