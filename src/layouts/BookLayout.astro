@@ -70,7 +70,7 @@ const { slug, title, chapters } = Astro.props;
             chapters.map((chapter, index) => (
               <li class="pb-4 text-sm text-gray-600 hover:text-black">
                 <a href={`/books/${slug}/${chapter.slug}`} class="flex gap-2">
-                  <span class="font-semibold">
+                  <span class="font-bold">
                     {(index + 1).toString().padStart(2, "0")}
                   </span>
                   <span>{chapter.title}</span>

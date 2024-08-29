@@ -44,7 +44,7 @@ const { book, chapter, chapterIndex } = Astro.props;
   <BookLayout {...book}>
     <article class="mx-auto max-w-4xl p-5 sm:p-12">
       <header class="border-b pb-4">
-        <div class="font-semibold text-gray-600">
+        <div class="font-bold text-gray-600">
           Chapter {(chapterIndex + 1).toString().padStart(2, "0")}
         </div>
         <h1 class="mt-2 text-3xl font-bold">{chapter.title}</h1>
@@ -66,7 +66,7 @@ const { book, chapter, chapterIndex } = Astro.props;
               >
                 <div class="h-full">
                   <div class="text-sm text-gray-600">NEXT</div>
-                  <div class="mt-2 font-semibold">
+                  <div class="mt-2 font-bold">
                     {book.chapters.at(chapterIndex + 1)?.title}
                   </div>
                 </div>
@@ -85,7 +85,7 @@ const { book, chapter, chapterIndex } = Astro.props;
                 <Icon name="lucide:arrow-left" class="text-lg text-gray-600" />
                 <div class="h-full">
                   <div class="text-sm text-gray-600">PREV</div>
-                  <div class="mt-2 font-semibold">
+                  <div class="mt-2 font-bold">
                     {book.chapters.at(chapterIndex - 1)?.title}
                   </div>
                 </div>
