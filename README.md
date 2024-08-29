@@ -1,47 +1,13 @@
-# Astro Starter Kit: Minimal
+# Zenn Private Preview
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Zennの記事を限定公開するサードパーティのGitHub Actionです。Zennの記事管理用リポジトリからプレビュー用のサイトを生成し、Cloudflare Pagesにデプロイします。
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+## 機能
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- [zenn-markdown-html](https://www.npmjs.com/package/zenn-markdown-html)と[zenn-content-css](https://www.npmjs.com/package/zenn-content-css)を利用したZenn風のプレビューサイト
+- Basic認証によるアクセス制限
 
-## 🚀 Project Structure
+## 注意事項
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- このGitHub ActionはZenn公式のものではありません
+- 生成されるプレビューページは、Zennが提供している埋め込みサーバーを利用しているため、商用利用は不可能です（[参照](https://github.com/zenn-dev/zenn-editor/tree/canary/packages/zenn-markdown-html#zenndev-%E3%81%A8%E5%90%8C%E3%81%98%E5%9F%8B%E3%82%81%E8%BE%BC%E3%81%BF%E8%A6%81%E7%B4%A0%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B)）
