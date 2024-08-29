@@ -27,6 +27,11 @@ inputs:
     description: Basic auth password
     required: false
 
+outputs:
+  deployment-url:
+    description: プレビューページのURL
+    value: ${{ steps.echo-outputs.outputs.deployment-url }}
+
 runs:
   using: composite
   steps:
@@ -45,6 +50,8 @@ runs:
         cd zenn-private-preview
         bun install
 
+    # ビルド
+    # 1. Privateリポジトリ
     - if: github.event.repository.private == true
       name: Privateリポジトリ設定でプレビューページをビルド
       shell: bash
@@ -54,6 +61,7 @@ runs:
         cd zenn-private-preview
         bun run build
 
+    # 2. Publicリポジトリ
     - if: github.event.repository.private == false
       name: Publicリポジトリ設定でプレビューページをビルド
       shell: bash
@@ -64,43 +72,61 @@ runs:
         cd zenn-private-preview
         bun run build
 
-    - if: ${{ inputs.enable-basic-auth == 'true' && inputs.basic-auth-username != '' && inputs.basic-auth-password != '' }}
-      name: Basic認証のシークレットを設定
-      shell: bash
-      env:
-        CLOUDFLARE_CDDOUNT_ID: ${{ inputs.cloudflare-account-id }}
-        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
-        CLOUDFLARE_PROJECT_NAME: ${{ inputs.cloudflare-project-name }}
-        BASIC_AUTH_USERNAME: ${{ inputs.basic-auth-username }}
-        BASIC_AUTH_PASSWORD: ${{ inputs.basic-auth-password }}
-      run: |
-        cd zenn-private-preview
-        echo "{ \"BASIC_AUTH_USERNAME\": \"${BASIC_AUTH_USERNAME}\", \"BASIC_AUTH_PASSWORD\": \"${BASIC_AUTH_PASSWORD}\" }" | bun wrangler pages secret bulk --project-name ${CLOUDFLARE_PROJECT_NAME}
-
-    - if: ${{ inputs.enable-basic-auth == 'true' }}
-      name: Basic認証付きでプレビューページをデプロイ
-      shell: bash
-      env:
-        CLOUDFLARE_CDDOUNT_ID: ${{ inputs.cloudflare-account-id }}
-        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
-        CLOUDFLARE_PROJECT_NAME: ${{ inputs.cloudflare-project-name }}
-      run: |
-        cd zenn-private-preview
-        DEPLOYED_URL=$(bun wrangler pages deploy ./dist --project-name ${CLOUDFLARE_PROJECT_NAME} | grep -oP 'https?://[a-zA-Z0-9.-]+\.pages\.dev')
-        echo "deployed-url=${DEPLOYED_URL}" >> $GITHUB_OUTPUT
+    # デプロイ
+    # 1. Basic認証なし
+    - if: ${{ inputs.enable-basic-auth == 'false' }}
+      id: deploy-disabled-basic-auth
+      name: Basic認証なしでプレビューページをデプロイ
+      uses: cloudflare/wrangler-action@v3
+      with:
+        accountId: ${{ inputs.cloudflare-account-id }}
+        apiToken: ${{ inputs.cloudflare-api-token }}
+        workingDirectory: zenn-private-preview/dist
+        command: pages deploy . --project-name ${{ inputs.cloudflare-project-name }} --commit-dirty=true
 
     - if: ${{ inputs.enable-basic-auth == 'false' }}
-      name: Basic認証なしでプレビューページをデプロイ
+      name: プレビューページのURLを出力
       shell: bash
-      env:
-        CLOUDFLARE_CDDOUNT_ID: ${{ inputs.cloudflare-account-id }}
-        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
-        CLOUDFLARE_PROJECT_NAME: ${{ inputs.cloudflare-project-name }}
-      run: |
-        cd zenn-private-preview/dist
-        DEPLOYED_URL=$(bun wrangler pages deploy . --project-name ${CLOUDFLARE_PROJECT_NAME} | grep -oP 'https?://[a-zA-Z0-9.-]+\.pages\.dev')
-        echo "deployed-url=${DEPLOYED_URL}" >> $GITHUB_OUTPUT
+      run: 'echo "deployment-url=${{ steps.deploy-disabled-basic-auth.outputs.deployment-url }}" >> $GITHUB_OUTPUT'
 
-outputs:
-  deployment-url:
-    description: プレビューページのURL
+    # 2. Basic認証あり
+    - if: ${{ inputs.enable-basic-auth == 'true' && inputs.basic-auth-username != '' && inputs.basic-auth-password != '' }}
+      name: Basic認証のシークレットを設定
+      uses: cloudflare/wrangler-action@v3
+      env:
+        BASIC_AUTH_USERNAME: ${{ inputs.basic-auth-username }}
+        BASIC_AUTH_PASSWORD: ${{ inputs.basic-auth-password }}
+      with:
+        accountId: ${{ inputs.cloudflare-account-id }}
+        apiToken: ${{ inputs.cloudflare-api-token }}
+        workingDirectory: zenn-private-preview
+        preCommands: |
+          SECRET_BULK="{ \"BASIC_AUTH_USERNAME\": \"${BASIC_AUTH_USERNAME}\", \"BASIC_AUTH_PASSWORD\": \"${BASIC_AUTH_PASSWORD}\" }"
+        command: pages secret bulk --project-name ${{ inputs.cloudflare-project-name }} ${SECRET_BULK}
+
+    - if: ${{ inputs.enable-basic-auth == 'true' }}
+      id: deploy-enabled-basic-auth
+      name: Basic認証付きでプレビューページをデプロイ
+      uses: cloudflare/wrangler-action@v3
+      with:
+        accountId: ${{ inputs.cloudflare-account-id }}
+        apiToken: ${{ inputs.cloudflare-api-token }}
+        workingDirectory: zenn-private-preview
+        command: pages deploy ./dist --project-name ${{ inputs.cloudflare-project-name }} --commit-dirty=true
+
+    - if: ${{ inputs.enable-basic-auth == 'true' }}
+      name: プレビューページのURLを出力
+      shell: bash
+      run: 'echo "deployment-url=${{ steps.deploy-enabled-basic-auth.outputs.deployment-url }}" >> $GITHUB_OUTPUT'
+
+    - id: echo-outputs
+      name: outputsを出力
+      shell: bash
+      run: |
+        DEPLOYMENT_URL_DISABLED_BASIC_AUTH=${{ steps.deploy-disabled-basic-auth.outputs.deployment-url }}
+        DEPLOYMENT_URL_ENABLED_BASIC_AUTH=${{ steps.deploy-enabled-basic-auth.outputs.deployment-url }}
+        if [ -n "$DEPLOYMENT_URL_DISABLED_BASIC_AUTH" ]; then
+          echo "deployment-url=${DEPLOYMENT_URL_DISABLED_BASIC_AUTH}" >> $GITHUB_OUTPUT
+        else
+          echo "deployment-url=${DEPLOYMENT_URL_ENABLED_BASIC_AUTH}" >> $GITHUB_OUTPUT
+        fi
